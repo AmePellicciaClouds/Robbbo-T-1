@@ -22,245 +22,266 @@ jobs:
           mkdir -p api-orchestration/src
           mkdir -p common/src
           mkdir -p docs/diagrams
-          
-      - name: Create package.json
-        run: |
-          cat > package.json << 'EOL'
-          {
-            "name": "api-integration-strategy",
-            "version": "1.0.0",
-            "description": "Comprehensive API Integration Strategy with multiple approaches",
-            "scripts": {
-              "start:adaptation": "node adaptation-layer/src/index.js",
-              "start:facades": "node microservices-facades/src/index.js",
-              "start:transformation": "node transformation-framework/src/index.js",
-              "start:metadata": "node metadata-driven-approach/src/index.js",
-              "start:orchestration": "node api-orchestration/src/index.js",
-              "test": "jest"
-            },
-            "keywords": ["api", "integration", "rest", "graphql", "soap", "facade", "adaptation", "transformation"],
-            "author": "Robbbo-T",
-            "license": "MIT",
-            "dependencies": {
-              "express": "^4.18.2",
-              "axios": "^1.3.4",
-              "graphql": "^16.6.0",
-              "apollo-server-express": "^3.12.0",
-              "soap": "^1.0.0",
-              "protobufjs": "^7.2.3",
-              "ajv": "^8.12.0",
-              "openapi-types": "^12.1.0",
-              "swagger-ui-express": "^4.6.2"
-            },
-            "devDependencies": {
-              "typescript": "^5.0.4",
-              "jest": "^29.5.0",
-              "supertest": "^6.3.3",
-              "@types/express": "^4.17.17",
-              "@types/node": "^18.15.11"
-            }
-          }
-          EOL
-          
-      - name: Create architecture diagram
-        run: |
-          cat > docs/diagrams/architecture-diagram.mmd << 'EOL'
-          graph TD
-              Client[Client Applications] --> Gateway[API Gateway]
-              Gateway --> AL[Adaptation Layer]
-              Gateway --> MSF[Microservices with API Facades]
-              Gateway --> TF[Transformation Framework]
-              Gateway --> MDA[Metadata-Driven Approach]
-              Gateway --> AO[API Orchestration]
-              
-              AL -->|Transforms| Backend1[Backend Services]
-              MSF --> |Routes to| Backend2[Backend Services]
-              TF --> |Converts data for| Backend3[Backend Services]
-              MDA --> |Generates endpoints for| Backend4[Backend Services]
-              AO --> |Orchestrates calls to| Backend5[Backend Services]
-              
-              subgraph "Integration Strategies"
-                  AL
-                  MSF
-                  TF
-                  MDA
-                  AO
-              end
-              
-              subgraph "Backend Systems"
-                  Backend1
-                  Backend2
-                  Backend3
-                  Backend4
-                  Backend5
-              end
-          EOL
-      
-      - name: Create CONTRIBUTING.md
-        run: |
-          cat > CONTRIBUTING.md << 'EOL'
-          # Contributing to API Integration Strategy
-          
-          Thank you for considering contributing to this project! Here's how you can help:
-          
-          ## Code of Conduct
-          
-          This project adheres to a Code of Conduct. By participating, you are expected to uphold this code.
-          
-          ## How to Contribute
-          
-          1. Fork the repository
-          2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-          3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-          4. Push to the branch (`git push origin feature/amazing-feature`)
-          5. Open a Pull Request
-          
-          ## Development Setup
-          
-          ```bash
-          npm install
-          ```
-          
-          ## Testing
-          
-          ```bash
-          npm test
-          ```
-          
-          ## Style Guide
-          
-          Please follow the existing code style and structure.
-          
-          ## Issue Reporting
-          
-          For bug reports or feature requests, please use the GitHub issue tracker.
-          EOL
-          
-      - name: Create LICENSE
-        run: |
-          cat > LICENSE << 'EOL'
-          MIT License
-          
-          Copyright (c) 2025 Robbbo-T
-          
-          Permission is hereby granted, free of charge, to any person obtaining a copy
-          of this software and associated documentation files (the "Software"), to deal
-          in the Software without restriction, including without limitation the rights
-          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-          copies of the Software, and to permit persons to whom the Software is
-          furnished to do so, subject to the following conditions:
-          
-          The above copyright notice and this permission notice shall be included in all
-          copies or substantial portions of the Software.
-          
-          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-          IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-          FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-          AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-          LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-          SOFTWARE.
-          EOL
-          
-      - name: Initialize approach directories with READMEs
-        run: |
-          for dir in adaptation-layer microservices-facades transformation-framework metadata-driven-approach api-orchestration common; do
-            cat > ${dir}/README.md << EOL
-          # ${dir}
-          
-          This directory contains the implementation for the ${dir} approach of the API Integration Strategy.
-          
-          ## Overview
-          
-          TODO: Add specific information about this approach.
-          
-          ## Getting Started
-          
-          \`\`\`bash
-          npm install
-          npm run start:${dir#*/}
-          \`\`\`
-          
-          ## Architecture
-          
-          TODO: Add architecture diagram specific to this approach.
-          
-          ## Implementation Details
-          
-          TODO: Add implementation details.
-          EOL
-          done
-          
-      - name: Create API Orchestration sample
-        run: |
-          mkdir -p api-orchestration/src/examples
-          cat > api-orchestration/src/examples/OrderProcessingOrchestration.ts << 'EOL'
-          import { OrchestrationBuilder } from '../OrchestrationBuilder';
-          
-          /**
-           * Example Order Processing Orchestration that coordinates between
-           * multiple backend services to process an order
-           */
-          export function createOrderProcessingOrchestration() {
-            const builder = new OrchestrationBuilder('order-processing');
-            
-            return builder
-              .step('validate-inventory')
-                .callService('inventory-service', '/api/check-availability')
-                .withRequestTransform((request) => ({
-                  productIds: request.items.map(item => item.productId),
-                  quantities: request.items.map(item => item.quantity)
-                }))
-                .withResponseCondition((response) => response.allAvailable)
-              .step('process-payment')
-                .callService('payment-service', '/api/payments')
-                .withRequestTransform((request, context) => ({
-                  amount: request.totalAmount,
-                  currency: request.currency,
-                  paymentMethod: request.paymentDetails,
-                  orderId: context.orderId
-                }))
-              .step('reserve-inventory')
-                .callService('inventory-service', '/api/reserve')
-                .withRequestTransform((request, context) => ({
-                  orderId: context.orderId,
-                  items: request.items
-                }))
-              .step('create-shipment')
-                .callService('logistics-service', '/api/shipments')
-                .withRequestTransform((request, context) => ({
-                  orderId: context.orderId,
-                  address: request.shippingAddress,
-                  items: request.items
-                }))
-              .step('send-confirmation')
-                .callService('notification-service', '/api/notify')
-                .withRequestTransform((request, context) => ({
-                  to: request.customerEmail,
-                  template: 'order-confirmation',
-                  data: {
-                    orderId: context.orderId,
-                    items: request.items,
-                    total: request.totalAmount,
-                    shipmentId: context.shipmentId
-                  }
-                }))
-              .build();
-          }
-          EOL
-          
-      - name: Validate XML against S1000D Schema
-        run: |
-          xmllint --noout --schema schemas/S1000D_6.0_Schema.xsd data/ATA71.xml
-
-      - name: Run BREX Compliance Check
-        run: |
-          python tools/brex_check.py rules/ProjectBREX.xml data/ATA71.xml
-
-      - name: Commit and push changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "Initialize API Integration Strategy repository structure"
-          git push
+          mkdir -p docs/air/00
+          mkdir -p docs/air/01
+          mkdir -p docs/air/02
+          mkdir -p docs/air/03
+          mkdir -p docs/air/04
+          mkdir -p docs/air/05
+          mkdir -p docs/air/06
+          mkdir -p docs/air/07
+          mkdir -p docs/air/08
+          mkdir -p docs/air/09
+          mkdir -p docs/air/10
+          mkdir -p docs/air/11
+          mkdir -p docs/air/12
+          mkdir -p docs/air/13
+          mkdir -p docs/air/14
+          mkdir -p docs/air/15
+          mkdir -p docs/air/16
+          mkdir -p docs/air/17
+          mkdir -p docs/air/18
+          mkdir -p docs/air/19
+          mkdir -p docs/air/20
+          mkdir -p docs/air/21
+          mkdir -p docs/air/22
+          mkdir -p docs/air/23
+          mkdir -p docs/air/24
+          mkdir -p docs/air/25
+          mkdir -p docs/air/26
+          mkdir -p docs/air/27
+          mkdir -p docs/air/28
+          mkdir -p docs/air/29
+          mkdir -p docs/air/30
+          mkdir -p docs/air/31
+          mkdir -p docs/air/32
+          mkdir -p docs/air/33
+          mkdir -p docs/air/34
+          mkdir -p docs/air/35
+          mkdir -p docs/air/36
+          mkdir -p docs/air/37
+          mkdir -p docs/air/38
+          mkdir -p docs/air/39
+          mkdir -p docs/air/40
+          mkdir -p docs/air/41
+          mkdir -p docs/air/42
+          mkdir -p docs/air/43
+          mkdir -p docs/air/44
+          mkdir -p docs/air/45
+          mkdir -p docs/air/46
+          mkdir -p docs/air/47
+          mkdir -p docs/air/48
+          mkdir -p docs/air/49
+          mkdir -p docs/air/50
+          mkdir -p docs/air/51
+          mkdir -p docs/air/52
+          mkdir -p docs/air/53
+          mkdir -p docs/air/54
+          mkdir -p docs/air/55
+          mkdir -p docs/air/56
+          mkdir -p docs/air/57
+          mkdir -p docs/air/58
+          mkdir -p docs/air/59
+          mkdir -p docs/air/60
+          mkdir -p docs/air/61
+          mkdir -p docs/air/62
+          mkdir -p docs/air/63
+          mkdir -p docs/air/64
+          mkdir -p docs/air/65
+          mkdir -p docs/air/66
+          mkdir -p docs/air/67
+          mkdir -p docs/air/68
+          mkdir -p docs/air/69
+          mkdir -p docs/air/70
+          mkdir -p docs/air/71
+          mkdir -p docs/air/72
+          mkdir -p docs/air/73
+          mkdir -p docs/air/74
+          mkdir -p docs/air/75
+          mkdir -p docs/air/76
+          mkdir -p docs/air/77
+          mkdir -p docs/air/78
+          mkdir -p docs/air/79
+          mkdir -p docs/air/80
+          mkdir -p docs/air/81
+          mkdir -p docs/air/82
+          mkdir -p docs/air/83
+          mkdir -p docs/air/84
+          mkdir -p docs/air/85
+          mkdir -p docs/air/86
+          mkdir -p docs/air/87
+          mkdir -p docs/air/88
+          mkdir -p docs/air/89
+          mkdir -p docs/air/90
+          mkdir -p docs/air/91
+          mkdir -p docs/air/92
+          mkdir -p docs/air/93
+          mkdir -p docs/air/94
+          mkdir -p docs/air/95
+          mkdir -p docs/air/96
+          mkdir -p docs/air/97
+          mkdir -p docs/air/98
+          mkdir -p docs/air/99
+          mkdir -p docs/space/ss/10
+          mkdir -p docs/space/ss/20
+          mkdir -p docs/space/ss/30
+          mkdir -p docs/space/ss/40
+          mkdir -p docs/space/ss/50
+          mkdir -p docs/space/ss/60
+          mkdir -p docs/space/ss/70
+          mkdir -p docs/space/ss/80
+          mkdir -p docs/space/ss/90
+          mkdir -p docs/space/mo/10
+          mkdir -p docs/space/mo/20
+          mkdir -p docs/space/mo/30
+          mkdir -p docs/space/mo/40
+          mkdir -p docs/space/mo/50
+          mkdir -p docs/space/mo/60
+          mkdir -p docs/space/mo/70
+          mkdir -p docs/space/mo/80
+          mkdir -p docs/space/mo/90
+          mkdir -p docs/space/se/10
+          mkdir -p docs/space/se/20
+          mkdir -p docs/space/se/30
+          mkdir -p docs/space/se/40
+          mkdir -p docs/space/se/50
+          mkdir -p docs/space/se/60
+          mkdir -p docs/space/se/70
+          mkdir -p docs/space/se/80
+          mkdir -p docs/space/se/90
+          mkdir -p docs/space/ls/10
+          mkdir -p docs/space/ls/20
+          mkdir -p docs/space/ls/30
+          mkdir -p docs/space/ls/40
+          mkdir -p docs/space/ls/50
+          mkdir -p docs/space/ls/60
+          mkdir -p docs/space/ls/70
+          mkdir -p docs/space/ls/80
+          mkdir -p docs/space/ls/90
+          mkdir -p docs/space/sr/10
+          mkdir -p docs/space/sr/20
+          mkdir -p docs/space/sr/30
+          mkdir -p docs/space/sr/40
+          mkdir -p docs/space/sr/50
+          mkdir -p docs/space/sr/60
+          mkdir -p docs/space/sr/70
+          mkdir -p docs/space/sr/80
+          mkdir -p docs/space/sr/90
+          mkdir -p docs/common/fd
+          mkdir -p docs/common/cn
+          mkdir -p docs/common/gb
+          mkdir -p docs/common/supl
+          mkdir -p docs/common/rame
+          mkdir -p docs/common/pm
+          mkdir -p docs/common/ds
+          mkdir -p docs/common/dimensions
+          mkdir -p docs/common/rs
+          mkdir -p docs/GP-AM/00
+          mkdir -p docs/GP-AM/01
+          mkdir -p docs/GP-AM/02
+          mkdir -p docs/GP-AM/03
+          mkdir -p docs/GP-AM/04
+          mkdir -p docs/GP-AM/05
+          mkdir -p docs/GP-AM/06
+          mkdir -p docs/GP-AM/07
+          mkdir -p docs/GP-AM/08
+          mkdir -p docs/GP-AM/09
+          mkdir -p docs/GP-AM/10
+          mkdir -p docs/GP-AM/11
+          mkdir -p docs/GP-AM/12
+          mkdir -p docs/GP-AM/13
+          mkdir -p docs/GP-AM/14
+          mkdir -p docs/GP-AM/15
+          mkdir -p docs/GP-AM/16
+          mkdir -p docs/GP-AM/17
+          mkdir -p docs/GP-AM/18
+          mkdir -p docs/GP-AM/19
+          mkdir -p docs/GP-AM/20
+          mkdir -p docs/GP-AM/21
+          mkdir -p docs/GP-AM/22
+          mkdir -p docs/GP-AM/23
+          mkdir -p docs/GP-AM/24
+          mkdir -p docs/GP-AM/25
+          mkdir -p docs/GP-AM/26
+          mkdir -p docs/GP-AM/27
+          mkdir -p docs/GP-AM/28
+          mkdir -p docs/GP-AM/29
+          mkdir -p docs/GP-AM/30
+          mkdir -p docs/GP-AM/31
+          mkdir -p docs/GP-AM/32
+          mkdir -p docs/GP-AM/33
+          mkdir -p docs/GP-AM/34
+          mkdir -p docs/GP-AM/35
+          mkdir -p docs/GP-AM/36
+          mkdir -p docs/GP-AM/37
+          mkdir -p docs/GP-AM/38
+          mkdir -p docs/GP-AM/39
+          mkdir -p docs/GP-AM/40
+          mkdir -p docs/GP-AM/41
+          mkdir -p docs/GP-AM/42
+          mkdir -p docs/GP-AM/43
+          mkdir -p docs/GP-AM/44
+          mkdir -p docs/GP-AM/45
+          mkdir -p docs/GP-AM/46
+          mkdir -p docs/GP-AM/47
+          mkdir -p docs/GP-AM/48
+          mkdir -p docs/GP-AM/49
+          mkdir -p docs/GP-AM/50
+          mkdir -p docs/GP-AM/51
+          mkdir -p docs/GP-AM/52
+          mkdir -p docs/GP-AM/53
+          mkdir -p docs/GP-AM/54
+          mkdir -p docs/GP-AM/55
+          mkdir -p docs/GP-AM/56
+          mkdir -p docs/GP-AM/57
+          mkdir -p docs/GP-AM/58
+          mkdir -p docs/GP-AM/59
+          mkdir -p docs/GP-AM/60
+          mkdir -p docs/GP-AM/61
+          mkdir -p docs/GP-AM/62
+          mkdir -p docs/GP-AM/63
+          mkdir -p docs/GP-AM/64
+          mkdir -p docs/GP-AM/65
+          mkdir -p docs/GP-AM/66
+          mkdir -p docs/GP-AM/67
+          mkdir -p docs/GP-AM/68
+          mkdir -p docs/GP-AM/69
+          mkdir -p docs/GP-AM/70
+          mkdir -p docs/GP-AM/71
+          mkdir -p docs/GP-AM/72
+          mkdir -p docs/GP-AM/73
+          mkdir -p docs/GP-AM/74
+          mkdir -p docs/GP-AM/75
+          mkdir -p docs/GP-AM/76
+          mkdir -p docs/GP-AM/77
+          mkdir -p docs/GP-AM/78
+          mkdir -p docs/GP-AM/79
+          mkdir -p docs/GP-AM/80
+          mkdir -p docs/GP-AM/81
+          mkdir -p docs/GP-AM/82
+          mkdir -p docs/GP-AM/83
+          mkdir -p docs/GP-AM/84
+          mkdir -p docs/GP-AM/85
+          mkdir -p docs/GP-AM/86
+          mkdir -p docs/GP-AM/87
+          mkdir -p docs/GP-AM/88
+          mkdir -p docs/GP-AM/89
+          mkdir -p docs/GP-AM/90
+          mkdir -p docs/GP-AM/91
+          mkdir -p docs/GP-AM/92
+          mkdir -p docs/GP-AM/93
+          mkdir -p docs/GP-AM/94
+          mkdir -p docs/GP-AM/95
+          mkdir -p docs/GP-AM/96
+          mkdir -p docs/GP-AM/97
+          mkdir -p docs/GP-AM/98
+          mkdir -p docs/GP-AM/99
+          mkdir -p docs/GP-AS/10
+          mkdir -p docs/GP-AS/20
+          mkdir -p docs/GP-AS/30
+          mkdir -p docs/GP-AS/40
+          mkdir -p docs/GP-AS/50
+          mkdir -p docs/GP-AS/60
+          mkdir -p docs/GP-AS/70
+          mkdir -p docs/GP-AS/80
+          mkdir -p docs/GP-AS/90
